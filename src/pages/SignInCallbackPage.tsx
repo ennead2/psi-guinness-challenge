@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { auth } from "@/firebase/firebase";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { signInWithCustomToken } from "firebase/auth";
+import { route } from "@/route/route";
 
 export const SignInCallbackPage = () => {
   const [loginStatus, setLoginStatus] = useState(true);
@@ -20,7 +21,7 @@ export const SignInCallbackPage = () => {
       signInWithCustomToken(auth, token)
         .then(() => {
           // console.log("ログイン成功");
-          navigate("/main");
+          navigate(route.main.selectContents);
         })
         .catch((error) => {
           console.error("ログイン失敗", error);
@@ -45,7 +46,7 @@ export const SignInCallbackPage = () => {
           textAlign={"center"}
           w={"fit-content"}
         >
-          <Link to="/sign-in">ログインページに戻る</Link>
+          <Link to={route.auth.signIn}>ログインページに戻る</Link>
         </Stack>
       )}
       <Spacer />

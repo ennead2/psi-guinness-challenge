@@ -8,12 +8,16 @@ import {
 import { Center, VStack, Box, Text, Stack } from "@chakra-ui/react";
 import { AnimatePresence } from "framer-motion";
 import { AuthProvider } from "./providers/AuthProvider";
-// import { HomePage } from "./pages/HomePage";
-// import { LessonPage } from "./pages/LessonPage";
-// import { SettingPage } from "./pages/SettingPage";
+import { route } from "./route/route";
 import { SignInPage } from "./pages/SignInPage";
 import { SignInCallbackPage } from "./pages/SignInCallbackPage";
-import { HomePage } from "./pages/HomePage";
+import { SendingPage } from "./pages/SendingPage";
+import { InputNicknamePage } from "./pages/InputNickname";
+import { TakePhotoPage } from "./pages/TakePhotoPage";
+import { InformationPage } from "./pages/InformationPage";
+import { PostedPhotoList } from "./pages/PostedPhotoList";
+import { SelectContentsPage } from "./pages/SelectContentsPage";
+import { PhotoConfirmationPage } from "./pages/PhotoConfirmationPage";
 
 function App() {
   return (
@@ -43,13 +47,35 @@ const Body = () => {
         <Routes location={location} key={location.pathname}>
           //! 新しいページを追加するときはここに追加
           <Route path="/" element={<Navigate to="/auth" />} />
-          <Route path="/auth" element={<Navigate to="/auth/sign-in" />} />
-          <Route path="/auth/sign-in" element={<SignInPage />} />
+          <Route path="/auth" element={<Navigate to={route.auth.signIn} />} />
+          <Route path={route.auth.signIn} element={<SignInPage />} />
           <Route
-            path="/auth/sign-in/callback"
+            path={route.auth.signInCallback}
             element={<SignInCallbackPage />}
           />
-          <Route path="/main" element={<HomePage />} />
+          <Route
+            path="/main"
+            element={<Navigate to={route.main.selectContents} />}
+          />
+          <Route
+            path={route.main.selectContents}
+            element={<SelectContentsPage />}
+          />
+          <Route path={route.main.information} element={<InformationPage />} />
+          <Route
+            path={route.main.inputNickname}
+            element={<InputNicknamePage />}
+          />
+          <Route path={route.main.takePhoto} element={<TakePhotoPage />} />
+          <Route
+            path={route.main.photoConfirmation}
+            element={<PhotoConfirmationPage />}
+          />
+          <Route path={route.main.sending} element={<SendingPage />} />
+          <Route
+            path={route.main.postedPhotoList}
+            element={<PostedPhotoList />}
+          />
         </Routes>
       </AnimatePresence>
     </Center>

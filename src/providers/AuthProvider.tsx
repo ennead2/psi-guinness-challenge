@@ -1,19 +1,40 @@
 import { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { auth } from "@/firebase/firebase";
+import { auth, db } from "@/firebase/firebase";
+import { doc, setDoc, getDoc } from "firebase/firestore";
+import { uidAtom } from "@/state/atom";
+import { useSetAtom } from "jotai/react";
 
 //? firebase auth provider
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const setUid = useSetAtom(uidAtom);
+
   //* ページ遷移時にログイン状態を確認
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (authUser) => {
-      // ログアウトした場合ログインページに遷移
-      if (!authUser && location.pathname.includes("/auth")) {
-        navigate("/auth/sign-in", { replace: true });
-        return;
+      if (authUser) {
+        // uidをローカルストレージに保存
+        const uid = authUser.uid.slice(authUser.uid.indexOf(":") + 1);
+        setUid(uid);
+        // firestoreにユーザー情報を保存（初回のみ）
+        const userDoc = await getDoc(doc(db, "users", uid));
+        if (!userDoc.exists()) {
+          const userRef = doc(db, "users", uid);
+          await setDoc(
+            userRef,
+            { uid, isNicknameSet: false, isPhotoSet: false },
+            { merge: true }
+          );
+        }
+      } else {
+        // ログアウトした場合ログインページに遷移
+        if (location.pathname.includes("/auth")) {
+          navigate("/auth/sign-in", { replace: true });
+          return;
+        }
       }
     });
 
