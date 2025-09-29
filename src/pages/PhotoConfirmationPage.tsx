@@ -5,7 +5,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { route } from "@/route/route";
 import { CustomButton } from "@/components/customs/CustomButton";
 import { db, storage } from "@/firebase/firebase";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { ref, uploadBytes } from "firebase/storage";
 import { uidAtom } from "@/state/atom";
 import { useAtomValue } from "jotai/react";
@@ -92,6 +92,7 @@ export const PhotoConfirmationPage = () => {
           photoUrl: directUrlPhoto,
           thumbnailUrl: directUrlThumbnail,
           isPhotoSet: true,
+          postedAt: serverTimestamp(),
         },
         { merge: true }
       );

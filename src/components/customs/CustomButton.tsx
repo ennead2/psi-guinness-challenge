@@ -8,7 +8,7 @@ import { FaArrowLeft } from "react-icons/fa";
 import { FaCamera } from "react-icons/fa";
 
 type CustomButtonProps = Omit<ButtonProps, "type"> & {
-  type?: "ok" | "back" | "photo";
+  type?: "ok" | "back" | "photo" | "select";
 };
 
 export const CustomButton = ({
@@ -53,6 +53,17 @@ export const CustomButton = ({
         >
           <FaCamera size={50} />
         </Stack>
+      ) : type === "select" ? (
+        <Button
+          p={6}
+          bg={"blue.600"}
+          _hover={{
+            bg: "blue.500",
+          }}
+          {...props}
+        >
+          {children}
+        </Button>
       ) : null}
     </>
   );

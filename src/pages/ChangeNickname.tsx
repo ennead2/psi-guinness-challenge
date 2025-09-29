@@ -15,8 +15,8 @@ export const ChangeNicknamePage = () => {
   const [nickname, setNickname] = useState("");
   const [preNickname, setPreNickname] = useState<string | null>(null);
   const [buttonState, setButtonState] = useState<
-    "ニックネームを送信" | "ニックネームを変更しない"
-  >("ニックネームを送信");
+    "ニックネームを変更" | "ニックネームを変更しない"
+  >("ニックネームを変更");
   const [isSending, setIsSending] = useState(false);
   const uid = useAtomValue(uidAtom);
 
@@ -39,7 +39,7 @@ export const ChangeNicknamePage = () => {
     if (nickname === preNickname) {
       setButtonState("ニックネームを変更しない");
     } else {
-      setButtonState("ニックネームを送信");
+      setButtonState("ニックネームを変更");
     }
   }, [nickname, preNickname]);
 
@@ -90,7 +90,7 @@ export const ChangeNicknamePage = () => {
           left={4}
         />
         <Text fontSize={"3xl"} p={4}>
-          ニックネーム入力
+          ニックネーム変更
         </Text>
 
         <Spacer />
