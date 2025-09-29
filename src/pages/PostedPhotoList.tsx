@@ -52,6 +52,8 @@ export const PostedPhotoList = () => {
       if (userDoc.exists()) {
         if ("nickname" in userDoc.data()) {
           setNickname(userDoc.data().nickname);
+        } else {
+          setNickname("ニックネーム未設定");
         }
       }
     })();
@@ -63,19 +65,18 @@ export const PostedPhotoList = () => {
       // 全ユーザー情報取得
       //todo 取得に時間がかかる場合、初期取得件数を制限する
       const querySnapshot = await getDocs(collection(db, "users"));
-      const _users = querySnapshot.docs.map((doc) => doc.data());
-      // date型に変換
-      _users.forEach((user) => (user.postedAt = user.postedAt.toDate()));
-      // 昇順に並び替え
-      _users.sort((a, b) => a.postedAt.getTime() - b.postedAt.getTime());
+      const allUsers = querySnapshot.docs.map((doc) => doc.data());
       // 全ユーザー数を登録
-      setTotalUsers(_users.length);
-      // 全投稿数を登録
-      setTotalPosts(
-        _users.reduce((acc, user) => ("postedAt" in user ? acc + 1 : acc), 0)
-      );
+      setTotalUsers(allUsers.length);
+      // 投稿済みのものだけを抽出し投稿数を記録
+      const postedUsers = allUsers.filter((user) => "postedAt" in user);
+      setTotalPosts(postedUsers.length);
+      // date型に変換
+      postedUsers.forEach((user) => (user.postedAt = user.postedAt.toDate()));
+      // 昇順に並び替え
+      postedUsers.sort((a, b) => a.postedAt.getTime() - b.postedAt.getTime());
       // ユーザー情報を登録
-      setUsers(_users as User[]);
+      setUsers(postedUsers as User[]);
     })();
   }, [uid]);
 
@@ -98,7 +99,7 @@ export const PostedPhotoList = () => {
       <CustomContainer>
         <CustomButton
           type="back"
-          onClick={() => navigate(-1)}
+          onClick={() => navigate(route.selectContents)}
           position={"absolute"}
           top={6}
           left={4}
@@ -108,36 +109,51 @@ export const PostedPhotoList = () => {
         </Text>
 
         <Stack w={"100%"}>
-          <Text>ログインユーザー：{nickname}</Text>
+          <Stack direction={"row"} justify={"space-between"} align={"center"}>
+            <Text>ユーザー：{nickname}</Text>
+            <CustomButton
+              type="ok"
+              px={2}
+              py={0}
+              w={"fit-content"}
+              onClick={() => navigate(route.list.changeNickname)}
+            >
+              ニックネーム変更
+            </CustomButton>
+          </Stack>
           <Text>総ユーザー数：{totalUsers}</Text>
-          <Text>総投稿数：{totalPosts}</Text>
-        </Stack>
-
-        <Stack direction={"row"} w={"100%"} m={4} justify={"space-evenly"}>
-          <CustomButton
-            type="select"
-            onClick={() => navigate(route.selectContents)}
-          >
-            コンテンツ選択へ戻る
-          </CustomButton>
-          <CustomButton
-            type="select"
-            onClick={() => navigate(route.list.changeNickname)}
-          >
-            ニックネーム変更
-          </CustomButton>
-          <CustomButton type="select" onClick={() => auth.signOut()}>
-            ログアウト
-          </CustomButton>
+          <Stack direction={"row"} justify={"space-between"} align={"center"}>
+            <Text>総投稿数：{totalPosts}</Text>
+            <CustomButton
+              type="cancel"
+              px={2}
+              py={0}
+              w={"fit-content"}
+              onClick={() => {
+                auth.signOut();
+                navigate(route.auth.signIn);
+              }}
+            >
+              ログアウト
+            </CustomButton>
+          </Stack>
         </Stack>
 
         <Spacer />
 
-        <Stack h={"70%"} w={"100%"} bg={"gray.200"} rounded={"xl"} p={4}>
+        <Stack
+          h={"70%"}
+          w={"100%"}
+          bg={"gray.200"}
+          direction={"row"}
+          rounded={"xl"}
+          p={4}
+        >
           {users.map((user) => (
             <Stack
               key={user.uid}
-              w={"20%"}
+              w={"33%"}
+              h={"fit-content"}
               bg={"white"}
               rounded={"md"}
               p={2}

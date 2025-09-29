@@ -46,7 +46,7 @@ const Body = () => {
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
           //! 新しいページを追加するときはここに追加
-          <Route path="/" element={<Navigate to="/main" />} />
+          <Route path="/" element={<Navigate to={route.selectContents} />} />
           <Route path="/auth" element={<Navigate to={route.auth.signIn} />} />
           <Route path={route.auth.signIn} element={<SignInPage />} />
           <Route

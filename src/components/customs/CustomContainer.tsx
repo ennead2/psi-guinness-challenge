@@ -12,6 +12,7 @@ export const CustomContainer = (args: { children: React.ReactNode }) => {
         h={"100%"}
         bg={"teal.200"}
         p={4}
+        color={"black"}
       >
         {children}
       </Flex>
