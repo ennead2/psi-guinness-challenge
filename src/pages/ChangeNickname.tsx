@@ -10,7 +10,7 @@ import { doc, collection, setDoc, getDocs, getDoc } from "firebase/firestore";
 import { uidAtom } from "@/state/atom";
 import { useAtomValue } from "jotai/react";
 
-export const InputNicknamePage = () => {
+export const ChangeNicknamePage = () => {
   const navigate = useNavigate();
   const [nickname, setNickname] = useState("");
   const [preNickname, setPreNickname] = useState<string | null>(null);
@@ -72,8 +72,8 @@ export const InputNicknamePage = () => {
         { nickname, isNicknameSet: true },
         { merge: true }
       );
-      // 撮影ページに遷移
-      navigate(route.main.takePhoto);
+      // 投稿写真一覧ページに遷移
+      navigate(route.main.postedPhotoList);
     } finally {
       setIsSending(false);
     }

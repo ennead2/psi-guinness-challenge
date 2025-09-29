@@ -11,5 +11,6 @@ export const route = {
     photoConfirmation: "/main/photo-confirmation",
     sending: "/main/sending",
     postedPhotoList: "/main/posted-photo-list",
+    changeNickname: "/main/change-nickname",
   },
 };

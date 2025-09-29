@@ -18,6 +18,7 @@ import { InformationPage } from "./pages/InformationPage";
 import { PostedPhotoList } from "./pages/PostedPhotoList";
 import { SelectContentsPage } from "./pages/SelectContentsPage";
 import { PhotoConfirmationPage } from "./pages/PhotoConfirmationPage";
+import { ChangeNicknamePage } from "./pages/ChangeNickname";
 
 function App() {
   return (
@@ -46,7 +47,7 @@ const Body = () => {
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
           //! 新しいページを追加するときはここに追加
-          <Route path="/" element={<Navigate to="/auth" />} />
+          <Route path="/" element={<Navigate to="/main" />} />
           <Route path="/auth" element={<Navigate to={route.auth.signIn} />} />
           <Route path={route.auth.signIn} element={<SignInPage />} />
           <Route
@@ -75,6 +76,10 @@ const Body = () => {
           <Route
             path={route.main.postedPhotoList}
             element={<PostedPhotoList />}
+          />
+          <Route
+            path={route.main.changeNickname}
+            element={<ChangeNicknamePage />}
           />
         </Routes>
       </AnimatePresence>

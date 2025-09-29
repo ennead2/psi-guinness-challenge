@@ -16,6 +16,7 @@
     "@chakra-ui/react": "^3.27.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
+    "browser-image-compression": "^2.0.2",
     "firebase": "^12.3.0",
     "framer-motion": "^12.23.19",
     "jotai": "^2.14.0",
@@ -28,6 +29,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
+    "@types/node": "^24.5.2",
     "@types/react": "^19.1.13",
     "@types/react-dom": "^19.1.9",
     "@vitejs/plugin-basic-ssl": "^2.1.0",
