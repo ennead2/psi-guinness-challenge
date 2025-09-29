@@ -97,7 +97,7 @@ export const PhotoConfirmationPage = () => {
         { merge: true }
       );
       // 投稿写真一覧ページに遷移
-      navigate(route.main.postedPhotoList);
+      navigate(route.list.postedPhotoList);
     } catch (error) {
       console.error(error);
     } finally {

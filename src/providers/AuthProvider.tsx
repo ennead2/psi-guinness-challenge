@@ -30,8 +30,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           );
         }
       } else {
-        // ログアウトした場合ログインページに遷移
-        if (location.pathname.includes("/auth")) {
+        // uidをローカルストレージから削除
+        setUid(null);
+        // ログアウトした場合、写真投稿中の場合ログインページに遷移
+        if (location.pathname.includes("/post")) {
           navigate("/auth/sign-in", { replace: true });
           return;
         }

@@ -3,14 +3,15 @@ export const route = {
     signIn: "/auth/sign-in",
     signInCallback: "/auth/sign-in/callback",
   },
-  main: {
-    selectContents: "/main/select-contents",
-    information: "/main/information",
-    inputNickname: "/main/input-nickname",
-    takePhoto: "/main/take-photo",
-    photoConfirmation: "/main/photo-confirmation",
-    sending: "/main/sending",
-    postedPhotoList: "/main/posted-photo-list",
-    changeNickname: "/main/change-nickname",
+  selectContents: "/select-contents",
+  post: {
+    information: "/post/information",
+    inputNickname: "/post/input-nickname",
+    takePhoto: "/post/take-photo",
+    photoConfirmation: "/post/photo-confirmation",
+  },
+  list: {
+    postedPhotoList: "/list/posted-photo-list",
+    changeNickname: "/list/change-nickname",
   },
 };

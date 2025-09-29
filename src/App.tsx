@@ -11,7 +11,6 @@ import { AuthProvider } from "./providers/AuthProvider";
 import { route } from "./route/route";
 import { SignInPage } from "./pages/SignInPage";
 import { SignInCallbackPage } from "./pages/SignInCallbackPage";
-import { SendingPage } from "./pages/SendingPage";
 import { InputNicknamePage } from "./pages/InputNickname";
 import { TakePhotoPage } from "./pages/TakePhotoPage";
 import { InformationPage } from "./pages/InformationPage";
@@ -55,30 +54,30 @@ const Body = () => {
             element={<SignInCallbackPage />}
           />
           <Route
-            path="/main"
-            element={<Navigate to={route.main.selectContents} />}
+            path="/post"
+            element={<Navigate to={route.post.information} />}
           />
+          <Route path={route.selectContents} element={<SelectContentsPage />} />
+          <Route path={route.post.information} element={<InformationPage />} />
           <Route
-            path={route.main.selectContents}
-            element={<SelectContentsPage />}
-          />
-          <Route path={route.main.information} element={<InformationPage />} />
-          <Route
-            path={route.main.inputNickname}
+            path={route.post.inputNickname}
             element={<InputNicknamePage />}
           />
-          <Route path={route.main.takePhoto} element={<TakePhotoPage />} />
+          <Route path={route.post.takePhoto} element={<TakePhotoPage />} />
           <Route
-            path={route.main.photoConfirmation}
+            path={route.post.photoConfirmation}
             element={<PhotoConfirmationPage />}
           />
-          <Route path={route.main.sending} element={<SendingPage />} />
           <Route
-            path={route.main.postedPhotoList}
+            path="/list"
+            element={<Navigate to={route.list.postedPhotoList} />}
+          />
+          <Route
+            path={route.list.postedPhotoList}
             element={<PostedPhotoList />}
           />
           <Route
-            path={route.main.changeNickname}
+            path={route.list.changeNickname}
             element={<ChangeNicknamePage />}
           />
         </Routes>

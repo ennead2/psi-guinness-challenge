@@ -8,7 +8,7 @@ import { route } from "@/route/route";
 import { useState, useEffect } from "react";
 import { uidAtom } from "@/state/atom";
 import { useAtomValue } from "jotai/react";
-import { db } from "@/firebase/firebase";
+import { db, auth } from "@/firebase/firebase";
 import { doc, getDoc, collection, getDocs } from "firebase/firestore";
 
 type User = {
@@ -116,15 +116,18 @@ export const PostedPhotoList = () => {
         <Stack direction={"row"} w={"100%"} m={4} justify={"space-evenly"}>
           <CustomButton
             type="select"
-            onClick={() => navigate(route.main.selectContents)}
+            onClick={() => navigate(route.selectContents)}
           >
             コンテンツ選択へ戻る
           </CustomButton>
           <CustomButton
             type="select"
-            onClick={() => navigate(route.main.changeNickname)}
+            onClick={() => navigate(route.list.changeNickname)}
           >
             ニックネーム変更
+          </CustomButton>
+          <CustomButton type="select" onClick={() => auth.signOut()}>
+            ログアウト
           </CustomButton>
         </Stack>
 

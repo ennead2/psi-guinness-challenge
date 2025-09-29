@@ -27,13 +27,13 @@ export const SelectContentsPage = () => {
         <Stack h={"80%"} justify={"space-evenly"}>
           <CustomButton
             type="select"
-            onClick={() => navigate(route.main.information)}
+            onClick={() => navigate(route.post.information)}
           >
             写真を撮影して投稿
           </CustomButton>
           <CustomButton
             type="select"
-            onClick={() => navigate(route.main.postedPhotoList)}
+            onClick={() => navigate(route.list.postedPhotoList)}
           >
             投稿画像を確認
           </CustomButton>

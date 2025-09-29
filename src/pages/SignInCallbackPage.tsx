@@ -21,7 +21,7 @@ export const SignInCallbackPage = () => {
       signInWithCustomToken(auth, token)
         .then(() => {
           // console.log("ログイン成功");
-          navigate(route.main.selectContents);
+          navigate(route.selectContents);
         })
         .catch((error) => {
           console.error("ログイン失敗", error);

@@ -15,7 +15,7 @@ export const TakePhotoPage = () => {
   const handleCapture = () => {
     if (!cameraRef.current) return;
     const image = cameraRef.current.takeScreenshot(); // base64形式の画像
-    navigate(route.main.photoConfirmation, { state: { image } });
+    navigate(route.post.photoConfirmation, { state: { image } });
   };
 
   return (

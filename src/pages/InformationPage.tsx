@@ -39,7 +39,7 @@ export const InformationPage = () => {
 
         <CustomButton
           type="ok"
-          onClick={() => navigate(route.main.inputNickname)}
+          onClick={() => navigate(route.post.inputNickname)}
         >
           ニックネーム入力へ
         </CustomButton>

@@ -55,7 +55,7 @@ export const InputNicknamePage = () => {
       if (!uid) return;
       // 変更がない場合はそのまま遷移
       if (nickname === preNickname) {
-        navigate(route.main.takePhoto);
+        navigate(route.post.takePhoto);
         return;
       }
       // 重複チェック
@@ -73,7 +73,7 @@ export const InputNicknamePage = () => {
         { merge: true }
       );
       // 撮影ページに遷移
-      navigate(route.main.takePhoto);
+      navigate(route.post.takePhoto);
     } finally {
       setIsSending(false);
     }
