@@ -5,17 +5,20 @@ import {
   Routes,
   Navigate,
 } from "react-router-dom";
-import { Center, VStack, Box, Text, Stack } from "@chakra-ui/react";
+import { Center, VStack, Box, Stack } from "@chakra-ui/react";
 import { AnimatePresence } from "framer-motion";
 import { AuthProvider } from "./providers/AuthProvider";
 import { route } from "./route/route";
+import { MainLayout } from "./layouts/MainLayout";
+import { AuthLayout } from "./layouts/AuthLayout";
+import { PostLayout } from "./layouts/PostLayout";
+import { HomePage } from "./pages/HomePage";
 import { SignInPage } from "./pages/SignInPage";
 import { SignInCallbackPage } from "./pages/SignInCallbackPage";
 import { InputNicknamePage } from "./pages/InputNickname";
 import { TakePhotoPage } from "./pages/TakePhotoPage";
 import { InformationPage } from "./pages/InformationPage";
 import { PostedPhotoList } from "./pages/PostedPhotoList";
-import { SelectContentsPage } from "./pages/SelectContentsPage";
 import { PhotoConfirmationPage } from "./pages/PhotoConfirmationPage";
 import { ChangeNicknamePage } from "./pages/ChangeNickname";
 
@@ -23,7 +26,13 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <VStack bg={"gray.200"} h={"100svh"} w={"100svw"} gap={0}>
+        <VStack
+          bg={"gray.200"}
+          h={"100svh"}
+          w={"100svw"}
+          gap={0}
+          color={"black"}
+        >
           {/* <Box h={"10%"} w={"100%"} bg={"green.200"}>
             <Header />
           </Box> */}
@@ -44,42 +53,70 @@ const Body = () => {
   return (
     <Center h="100%" w="100%" position="relative" overflowX="hidden">
       <AnimatePresence mode="wait">
+        //! 新しいページを追加するときはここに追加
         <Routes location={location} key={location.pathname}>
-          //! 新しいページを追加するときはここに追加
-          <Route path="/" element={<Navigate to={route.selectContents} />} />
-          <Route path="/auth" element={<Navigate to={route.auth.signIn} />} />
-          <Route path={route.auth.signIn} element={<SignInPage />} />
+          //* ルートをメインに遷移
           <Route
-            path={route.auth.signInCallback}
-            element={<SignInCallbackPage />}
+            path={route.root}
+            element={<Navigate to={route.main.root} />}
           />
-          <Route
-            path="/post"
-            element={<Navigate to={route.post.information} />}
-          />
-          <Route path={route.selectContents} element={<SelectContentsPage />} />
-          <Route path={route.post.information} element={<InformationPage />} />
-          <Route
-            path={route.post.inputNickname}
-            element={<InputNicknamePage />}
-          />
-          <Route path={route.post.takePhoto} element={<TakePhotoPage />} />
-          <Route
-            path={route.post.photoConfirmation}
-            element={<PhotoConfirmationPage />}
-          />
-          <Route
-            path="/list"
-            element={<Navigate to={route.list.postedPhotoList} />}
-          />
-          <Route
-            path={route.list.postedPhotoList}
-            element={<PostedPhotoList />}
-          />
-          <Route
-            path={route.list.changeNickname}
-            element={<ChangeNicknamePage />}
-          />
+          //* メイン
+          <Route path={route.main.root} element={<MainLayout />}>
+            <Route
+              path={route.main.root}
+              element={<Navigate to={route.main.home} />}
+            />
+            // ホーム
+            <Route path={route.main.home} element={<HomePage />} />
+            // 投稿写真一覧
+            <Route
+              path={route.main.postedPhotoList}
+              element={<PostedPhotoList />}
+            />
+            // ニックネーム変更
+            <Route
+              path={route.main.changeNickname}
+              element={<ChangeNicknamePage />}
+            />
+          </Route>
+          //* 認証
+          <Route path={route.auth.root} element={<AuthLayout />}>
+            <Route
+              path={route.auth.root}
+              element={<Navigate to={route.auth.signIn} />}
+            />
+            // サインイン
+            <Route path={route.auth.signIn} element={<SignInPage />} />
+            // サインインコールバック
+            <Route
+              path={route.auth.signInCallback}
+              element={<SignInCallbackPage />}
+            />
+          </Route>
+          //* 写真投稿
+          <Route path={route.post.root} element={<PostLayout />}>
+            <Route
+              path={route.post.root}
+              element={<Navigate to={route.post.information} />}
+            />
+            // 注意事項
+            <Route
+              path={route.post.information}
+              element={<InformationPage />}
+            />
+            // ニックネーム入力
+            <Route
+              path={route.post.inputNickname}
+              element={<InputNicknamePage />}
+            />
+            // 写真撮影
+            <Route path={route.post.takePhoto} element={<TakePhotoPage />} />
+            // 写真確認
+            <Route
+              path={route.post.photoConfirmation}
+              element={<PhotoConfirmationPage />}
+            />
+          </Route>
         </Routes>
       </AnimatePresence>
     </Center>
@@ -109,8 +146,8 @@ const Body = () => {
 
 const Footer = () => {
   return (
-    <Stack h="100%" w="100%" align={"end"} justify={"end"} p={1}>
-      <Text>ennead.inc</Text>
+    <Stack h="100%" w="100%" align={"end"} justify={"end"} py={1} px={3}>
+      <small>&copy; 2025 ennead inc.</small>
     </Stack>
   );
 };

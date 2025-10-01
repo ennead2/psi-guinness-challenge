@@ -1,21 +1,47 @@
-import { Box, Flex } from "@chakra-ui/react";
+import { Stack, type StackProps } from "@chakra-ui/react";
 
-export const CustomContainer = (args: { children: React.ReactNode }) => {
-  const { children } = args;
+type CustomContainerProps = Omit<StackProps, "type"> & {
+  type?: "main" | "auth" | "post";
+};
+
+export const CustomContainer = ({
+  type = "main",
+  children,
+  ...props
+}: CustomContainerProps) => {
+  const styles = {
+    main: {
+      w: "100%",
+      h: "auto",
+      minH: "100%",
+      bg: "green.200",
+      align: "center",
+      justify: "center",
+      p: 2,
+    },
+    auth: {
+      w: "100%",
+      h: "auto",
+      minH: "100%",
+      bg: "teal.200",
+      align: "center",
+      justify: "center",
+      p: 2,
+    },
+    post: {
+      w: "100%",
+      h: "auto",
+      minH: "100%",
+      bg: "blue.200",
+      align: "center",
+      justify: "center",
+      p: 2,
+    },
+  };
+
   return (
-    <Box h={"100%"} w={"100%"} p={4}>
-      <Flex
-        direction={"column"}
-        align={"center"}
-        justify={"center"}
-        w={"100%"}
-        h={"100%"}
-        bg={"teal.200"}
-        p={4}
-        color={"black"}
-      >
-        {children}
-      </Flex>
-    </Box>
+    <Stack {...styles[type]} {...props}>
+      {children}
+    </Stack>
   );
 };

@@ -91,13 +91,21 @@ export const PhotoConfirmationPage = () => {
         {
           photoUrl: directUrlPhoto,
           thumbnailUrl: directUrlThumbnail,
-          isPhotoSet: true,
+          postedAt: serverTimestamp(),
+        },
+        { merge: true }
+      );
+      // サムネイルコレクションにも保存
+      await setDoc(
+        doc(db, "thumbnails", uid),
+        {
+          thumbnailUrl: directUrlThumbnail,
           postedAt: serverTimestamp(),
         },
         { merge: true }
       );
       // 投稿写真一覧ページに遷移
-      navigate(route.list.postedPhotoList);
+      navigate(route.main.postedPhotoList);
     } catch (error) {
       console.error(error);
     } finally {
@@ -107,13 +115,13 @@ export const PhotoConfirmationPage = () => {
 
   return (
     <CustomTransition>
-      <CustomContainer>
+      <CustomContainer type="post">
         <CustomButton
           type="back"
           onClick={() => navigate(-1)}
           position={"absolute"}
-          top={6}
-          left={4}
+          top={2}
+          left={0}
         />
         <Text fontSize={"3xl"} p={4}>
           投稿写真確認
@@ -133,7 +141,7 @@ export const PhotoConfirmationPage = () => {
 
         <Spacer />
 
-        <CustomButton onClick={handleSendImage} loading={isSending}>
+        <CustomButton mb={2} onClick={handleSendImage} loading={isSending}>
           写真を投稿
         </CustomButton>
       </CustomContainer>

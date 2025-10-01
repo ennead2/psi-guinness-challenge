@@ -20,7 +20,7 @@ export const CustomTransition = (args: { children: React.ReactNode }) => {
         duration: 0.4,
       }}
       style={{
-        position: "absolute",
+        // position: "absolute",
         top: 0,
         width: "100%",
         height: "100%",

@@ -1,50 +1,64 @@
-import { CustomContainer } from "@/components/customs/CustomContainer";
 import { Text, Spacer, Stack, Image } from "@chakra-ui/react";
 import { Link, useNavigate } from "react-router-dom";
 import lineLoginBtn from "/line_btn_login_base.png";
 import { CustomButton } from "@/components/customs/CustomButton";
 import { route } from "@/route/route";
-import { useEffect } from "react";
-import { uidAtom } from "@/state/atom";
-import { useAtomValue } from "jotai/react";
+import { useState } from "react";
+import { CustomContainer } from "@/components/customs/CustomContainer";
+import { ulid } from "ulid";
 
 export const SignInPage = () => {
   // 環境変数
   const LINE_CLIENT_ID = import.meta.env.VITE_LINE_CLIENT_ID;
   const REDIRECT_URI = import.meta.env.VITE_REDIRECT_URI;
+  // const frontend_redirect_uri = "https://localhost:5000";
+
+  const redirect_uri = `${REDIRECT_URI}`;
+  // + `?frontend_redirect_uri=${frontend_redirect_uri}`;
 
   const navigate = useNavigate();
 
-  const uid = useAtomValue(uidAtom);
+  const [loading, setLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
 
   //* LINEログインURL
-  const lineLoginUrl = `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=${LINE_CLIENT_ID}&redirect_uri=${encodeURIComponent(
-    REDIRECT_URI
-  )}&state=random_state&scope=openid%20profile%20email`;
+  const lineLoginUrl =
+    `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=${LINE_CLIENT_ID}` +
+    `&redirect_uri=${encodeURIComponent(redirect_uri)}` +
+    `&state=random_state&scope=openid%20profile%20email`;
 
   //* カスタムログイン
   const customLoginUrl = `https://asia-northeast1-psiguinnesschallenge.cloudfunctions.net/customAuthApi/customToken?uid=random:`;
   const handleCustomLogin = async () => {
-    const res = await fetch(`${customLoginUrl}${crypto.randomUUID()}`, {
-      method: "GET",
-    });
-    if (res.ok) {
-      const token = await res.text();
-      navigate(`${route.auth.signInCallback}?token=${token}`);
+    setLoading(true);
+    setIsError(false);
+    try {
+      const res = await fetch(`${customLoginUrl}${ulid()}`, {
+        method: "GET",
+      });
+      if (res.ok) {
+        const token = await res.text();
+        navigate(`${route.auth.signInCallback}?token=${token}`);
+      }
+    } catch (error) {
+      console.error(error);
+      setIsError(true);
+    } finally {
+      setLoading(false);
     }
   };
 
-  //* ログイン済みの場合はコンテンツ選択へ遷移
-  useEffect(() => {
-    if (uid) {
-      navigate(route.selectContents);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [uid]);
-
   return (
-    <CustomContainer>
-      <Stack w={"100%"} justify={"start"} p={4}>
+    <CustomContainer type="auth">
+      <CustomButton
+        type="back"
+        onClick={() => navigate(-1)}
+        position={"absolute"}
+        top={6}
+        left={4}
+      />
+
+      <Stack w={"100%"} justify={"center"} p={4} align={"center"}>
         <Text fontSize={"3xl"} color={"gray.700"}>
           Login Page
         </Text>
@@ -57,32 +71,34 @@ export const SignInPage = () => {
           LINE Login
         </Text>
         <Stack p={0} w={"200px"} textAlign={"center"}>
-          <Link to={lineLoginUrl}>
+          <Link to={loading ? "" : lineLoginUrl}>
             <Image src={lineLoginBtn} />
           </Link>
         </Stack>
       </Stack>
 
-      <Spacer />
-
       <Stack w={"100%"} p={4}>
-        <CustomButton type="ok" w={"fit-content"} onClick={handleCustomLogin}>
+        <Text fontSize={"lg"} fontWeight={"semibold"}>
           ランダムなUIDでログイン
+        </Text>
+        <CustomButton
+          type="ok"
+          w={"fit-content"}
+          loading={loading}
+          onClick={handleCustomLogin}
+          fontSize={"md"}
+        >
+          ログイン
         </CustomButton>
       </Stack>
 
       <Spacer />
 
-      <Stack w={"100%"} p={4}>
-        <CustomButton
-          type="select"
-          onClick={() => {
-            navigate(route.list.postedPhotoList);
-          }}
-        >
-          ログインせずに投稿一覧を見る
-        </CustomButton>
-      </Stack>
+      {isError && (
+        <Text>
+          ログインに失敗しました。お手数ですが通信状況をお確かめの上再度お試しください。
+        </Text>
+      )}
     </CustomContainer>
   );
 };

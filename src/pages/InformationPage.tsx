@@ -1,6 +1,6 @@
 import { CustomTransition } from "@/components/customs/CustomTransition";
 import { CustomContainer } from "@/components/customs/CustomContainer";
-import { Text, Stack, Spacer } from "@chakra-ui/react";
+import { Text, Spacer, List } from "@chakra-ui/react";
 import { CustomButton } from "@/components/customs/CustomButton";
 import { useNavigate } from "react-router-dom";
 import { route } from "@/route/route";
@@ -10,13 +10,13 @@ export const InformationPage = () => {
 
   return (
     <CustomTransition>
-      <CustomContainer>
+      <CustomContainer type="post">
         <CustomButton
           type="back"
           onClick={() => navigate(-1)}
           position={"absolute"}
-          top={6}
-          left={4}
+          top={2}
+          left={0}
         />
         <Text fontSize={"3xl"} p={4}>
           注意事項
@@ -24,21 +24,28 @@ export const InformationPage = () => {
 
         <Spacer />
 
-        <Stack bg={"gray.100"} p={4} rounded={"md"} fontWeight={"semibold"}>
-          <Text p={2}>写真は一度しかアップロードできません。</Text>
-          <Text p={2}>アップロードした画像は変更できません。</Text>
-          <Text p={2}>
+        <List.Root
+          bg={"gray.100"}
+          p={6}
+          gap={6}
+          rounded={"md"}
+          fontWeight={"semibold"}
+        >
+          <List.Item>写真は一度しかアップロードできません。</List.Item>
+          <List.Item>アップロードした画像は変更できません。</List.Item>
+          <List.Item>
             このサイト内で撮影した写真のみアップロードできます。
-          </Text>
-          <Text p={2}>
+          </List.Item>
+          <List.Item>
             画像と合わせてニックネームが表示されます。公序良俗に反するニックネームは使用できません。
-          </Text>
-        </Stack>
+          </List.Item>
+        </List.Root>
 
         <Spacer />
 
         <CustomButton
           type="ok"
+          mb={2}
           onClick={() => navigate(route.post.inputNickname)}
         >
           ニックネーム入力へ

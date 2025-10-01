@@ -1,6 +1,6 @@
 import { CustomTransition } from "@/components/customs/CustomTransition";
 import { CustomContainer } from "@/components/customs/CustomContainer";
-import { Text, Stack, Spacer, Input } from "@chakra-ui/react";
+import { Text, Stack, Spacer, Input, Field } from "@chakra-ui/react";
 import { CustomButton } from "@/components/customs/CustomButton";
 import { useNavigate } from "react-router-dom";
 import { route } from "@/route/route";
@@ -18,6 +18,7 @@ export const ChangeNicknamePage = () => {
     "ニックネームを変更" | "ニックネームを変更しない"
   >("ニックネームを変更");
   const [isSending, setIsSending] = useState(false);
+  const [isDuplicate, setIsDuplicate] = useState(false);
   const uid = useAtomValue(uidAtom);
 
   //* 現在入力されているニックネームを取得
@@ -45,7 +46,16 @@ export const ChangeNicknamePage = () => {
 
   //* 入力内容取得
   const handleNicknameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setIsDuplicate(false);
     setNickname(event.target.value);
+  };
+
+  //* エンターキーで送信
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      handleSendNickname();
+    }
   };
 
   //* ニックネームを送信
@@ -63,17 +73,13 @@ export const ChangeNicknamePage = () => {
       const users = querySnapshot.docs.map((doc) => doc.data());
       const isDuplicate = users.some((user) => user.nickname === nickname);
       if (isDuplicate) {
-        alert("既に使用されているニックネームです。");
+        setIsDuplicate(true);
         return;
       }
       // ニックネームを保存
-      await setDoc(
-        doc(db, "users", uid),
-        { nickname, isNicknameSet: true },
-        { merge: true }
-      );
+      await setDoc(doc(db, "users", uid), { nickname }, { merge: true });
       // 投稿写真一覧ページに遷移
-      navigate(route.list.postedPhotoList);
+      navigate(route.main.postedPhotoList);
     } finally {
       setIsSending(false);
     }
@@ -81,14 +87,7 @@ export const ChangeNicknamePage = () => {
 
   return (
     <CustomTransition>
-      <CustomContainer>
-        <CustomButton
-          type="back"
-          onClick={() => navigate(-1)}
-          position={"absolute"}
-          top={6}
-          left={4}
-        />
+      <CustomContainer type="main">
         <Text fontSize={"3xl"} p={4}>
           ニックネーム変更
         </Text>
@@ -96,22 +95,29 @@ export const ChangeNicknamePage = () => {
         <Spacer />
 
         <Stack w={"100%"} p={4}>
-          <Input
-            type="text"
-            placeholder={"ニックネーム"}
-            value={nickname}
-            p={4}
-            bg={"gray.100"}
-            onChange={handleNicknameChange}
-          />
+          <Field.Root invalid={isDuplicate}>
+            <Input
+              type="text"
+              placeholder={"ニックネーム"}
+              value={nickname}
+              p={4}
+              bg={"gray.100"}
+              onChange={handleNicknameChange}
+              onKeyDown={handleKeyDown}
+            />
+            <Field.ErrorText px={2}>
+              既に使用されているニックネームです
+            </Field.ErrorText>
+          </Field.Root>
         </Stack>
 
         <Spacer />
 
         <CustomButton
           type="ok"
+          mb={2}
           onClick={handleSendNickname}
-          disabled={!nickname}
+          disabled={!nickname || isDuplicate}
           loading={isSending}
         >
           {buttonState}

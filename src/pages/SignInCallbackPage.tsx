@@ -1,10 +1,10 @@
-import { CustomContainer } from "@/components/customs/CustomContainer";
 import { Text, Spacer, Stack } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { auth } from "@/firebase/firebase";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { signInWithCustomToken } from "firebase/auth";
 import { route } from "@/route/route";
+import { CustomContainer } from "@/components/customs/CustomContainer";
 
 export const SignInCallbackPage = () => {
   const [loginStatus, setLoginStatus] = useState(true);
@@ -21,7 +21,7 @@ export const SignInCallbackPage = () => {
       signInWithCustomToken(auth, token)
         .then(() => {
           // console.log("ログイン成功");
-          navigate(route.selectContents);
+          navigate(route.main.root);
         })
         .catch((error) => {
           console.error("ログイン失敗", error);
@@ -32,7 +32,7 @@ export const SignInCallbackPage = () => {
   }, [location.search]);
 
   return (
-    <CustomContainer>
+    <CustomContainer type="auth">
       <Spacer />
       <Text fontSize={"3xl"} color={"gray.700"}>
         {loginStatus ? "ログイン中・・・" : "ラインログインに失敗しました"}

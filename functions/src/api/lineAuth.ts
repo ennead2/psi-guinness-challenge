@@ -15,6 +15,8 @@ lineAuthApp.get("/line/callback", async (req, res) => {
     res.status(400).send("Missing authorization code.");
     return;
   }
+  const _front_uri = req.query.frontend_redirect_uri as string;
+  const front_uri = _front_uri ? _front_uri : FRONTEND_REDIRECT_URI;
 
   try {
     // console.log(
@@ -69,9 +71,9 @@ lineAuthApp.get("/line/callback", async (req, res) => {
     });
 
     // 4. フロントにリダイレクト（カスタムトークン付き）
-    res.redirect(`${FRONTEND_REDIRECT_URI}?token=${customToken}`);
+    res.redirect(`${front_uri}?token=${customToken}`);
   } catch (err) {
     console.error("LINE login failed", err);
-    res.status(500).send("LINE login failed");
+    // res.status(500).send("LINE login failed");
   }
 });

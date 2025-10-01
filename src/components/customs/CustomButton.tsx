@@ -69,11 +69,10 @@ export const CustomButton = ({
         </Stack>
       ) : type === "select" ? (
         <Button
-          p={6}
-          bg={"blue.600"}
-          color={"white"}
+          bg={"gray.700"}
+          color={"gray.200"}
           _hover={{
-            bg: "blue.500",
+            bg: "gray.600",
           }}
           {...props}
         >

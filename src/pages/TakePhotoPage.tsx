@@ -20,13 +20,13 @@ export const TakePhotoPage = () => {
 
   return (
     <CustomTransition>
-      <CustomContainer>
+      <CustomContainer type="post">
         <CustomButton
           type="back"
           onClick={() => navigate(-1)}
           position={"absolute"}
-          top={6}
-          left={4}
+          top={2}
+          left={0}
         />
         <Text fontSize={"3xl"} p={4}>
           撮影
@@ -38,7 +38,7 @@ export const TakePhotoPage = () => {
 
         <Spacer />
 
-        <CustomButton type="photo" onClick={handleCapture}>
+        <CustomButton type="photo" mb={4} onClick={handleCapture}>
           撮影ボタン
         </CustomButton>
       </CustomContainer>

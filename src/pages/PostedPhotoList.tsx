@@ -1,15 +1,10 @@
 import { CustomTransition } from "@/components/customs/CustomTransition";
 import { CustomContainer } from "@/components/customs/CustomContainer";
-import { Spacer, Stack, Text, Image } from "@chakra-ui/react";
-import { CustomButton } from "@/components/customs/CustomButton";
+import { Stack, Text, Image, SimpleGrid } from "@chakra-ui/react";
 import { CustomDialog } from "@/components/customs/CustomDialog";
-import { useNavigate } from "react-router-dom";
-import { route } from "@/route/route";
 import { useState, useEffect } from "react";
-import { uidAtom } from "@/state/atom";
-import { useAtomValue } from "jotai/react";
-import { db, auth } from "@/firebase/firebase";
-import { doc, getDoc, collection, getDocs } from "firebase/firestore";
+import { db } from "@/firebase/firebase";
+import { collection, onSnapshot } from "firebase/firestore";
 
 type User = {
   uid: string;
@@ -28,8 +23,6 @@ type SelectedPhoto = {
 };
 
 export const PostedPhotoList = () => {
-  const navigate = useNavigate();
-  const [nickname, setNickname] = useState<string | null>(null);
   const [users, setUsers] = useState<User[]>([]);
   const [totalUsers, setTotalUsers] = useState<number | null>(null);
   const [totalPosts, setTotalPosts] = useState<number | null>(null);
@@ -39,46 +32,31 @@ export const PostedPhotoList = () => {
     null
   );
 
-  const uid = useAtomValue(uidAtom);
-
-  //* ログインユーザー情報取得
-  useEffect(() => {
-    if (!uid) {
-      setNickname("匿名ログイン中");
-      return;
-    }
-    (async () => {
-      const userDoc = await getDoc(doc(db, "users", uid));
-      if (userDoc.exists()) {
-        if ("nickname" in userDoc.data()) {
-          setNickname(userDoc.data().nickname);
-        } else {
-          setNickname("ニックネーム未設定");
-        }
-      }
-    })();
-  }, [uid]);
-
   //* 投稿画像取得
   useEffect(() => {
-    (async () => {
-      // 全ユーザー情報取得
-      //todo 取得に時間がかかる場合、初期取得件数を制限する
-      const querySnapshot = await getDocs(collection(db, "users"));
-      const allUsers = querySnapshot.docs.map((doc) => doc.data());
-      // 全ユーザー数を登録
-      setTotalUsers(allUsers.length);
-      // 投稿済みのものだけを抽出し投稿数を記録
-      const postedUsers = allUsers.filter((user) => "postedAt" in user);
-      setTotalPosts(postedUsers.length);
-      // date型に変換
-      postedUsers.forEach((user) => (user.postedAt = user.postedAt.toDate()));
-      // 昇順に並び替え
-      postedUsers.sort((a, b) => a.postedAt.getTime() - b.postedAt.getTime());
-      // ユーザー情報を登録
-      setUsers(postedUsers as User[]);
-    })();
-  }, [uid]);
+    const unsubscribe = onSnapshot(
+      collection(db, "users"),
+      async (snapshot) => {
+        // 全ユーザー情報取得
+        const allUsers = snapshot.docs.map((doc) => doc.data());
+        // 全ユーザー数を登録
+        setTotalUsers(allUsers.length);
+        // 投稿済みのものだけを抽出し投稿数を記録
+        const postedUsers = allUsers.filter((user) => "postedAt" in user);
+        setTotalPosts(postedUsers.length);
+        // date型に変換
+        postedUsers.forEach((user) => (user.postedAt = user.postedAt.toDate()));
+        // 昇順に並び替え
+        postedUsers.sort((a, b) => b.postedAt.getTime() - a.postedAt.getTime());
+        // ユーザー情報を登録
+        setUsers(postedUsers as User[]);
+      }
+    );
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   //* 選択された画像を取得
   useEffect(() => {
@@ -96,72 +74,35 @@ export const PostedPhotoList = () => {
 
   return (
     <CustomTransition>
-      <CustomContainer>
-        <CustomButton
-          type="back"
-          onClick={() => navigate(route.selectContents)}
-          position={"absolute"}
-          top={6}
-          left={4}
-        />
+      <CustomContainer type="main" justify={"start"}>
         <Text fontSize={"3xl"} p={4}>
-          投稿画像一覧
+          投稿写真一覧
         </Text>
 
-        <Stack w={"100%"}>
-          <Stack direction={"row"} justify={"space-between"} align={"center"}>
-            <Text>ユーザー：{nickname}</Text>
-            <CustomButton
-              type="ok"
-              px={2}
-              py={0}
-              w={"fit-content"}
-              onClick={() => navigate(route.list.changeNickname)}
-            >
-              ニックネーム変更
-            </CustomButton>
-          </Stack>
-          <Text>総ユーザー数：{totalUsers}</Text>
-          <Stack direction={"row"} justify={"space-between"} align={"center"}>
+        <Stack w={"100%"} mb={4}>
+          <Stack direction={"row"} align={"center"} gap={6}>
+            <Text>総ユーザー数：{totalUsers}</Text>
             <Text>総投稿数：{totalPosts}</Text>
-            <CustomButton
-              type="cancel"
-              px={2}
-              py={0}
-              w={"fit-content"}
-              onClick={() => {
-                auth.signOut();
-                navigate(route.auth.signIn);
-              }}
-            >
-              ログアウト
-            </CustomButton>
           </Stack>
         </Stack>
 
-        <Spacer />
-
-        <Stack
-          h={"70%"}
-          w={"100%"}
-          bg={"gray.200"}
-          direction={"row"}
-          rounded={"xl"}
-          p={4}
-        >
+        <SimpleGrid columns={3} gap={1}>
           {users.map((user) => (
             <Stack
               key={user.uid}
-              w={"33%"}
+              w={"100%"}
               h={"fit-content"}
               bg={"white"}
               rounded={"md"}
-              p={2}
+              p={1}
               onClick={() => {
                 setSelectedUid(user.uid);
                 setIsOpen(true);
               }}
               cursor={"pointer"}
+              shadow="sm"
+              _hover={{ shadow: "md", transform: "scale(1.02)" }}
+              transition="all 0.2s"
             >
               <Image
                 src={user.thumbnailUrl}
@@ -177,7 +118,7 @@ export const PostedPhotoList = () => {
               </Text>
             </Stack>
           ))}
-        </Stack>
+        </SimpleGrid>
 
         <CustomDialog isOpen={isOpen} setIsOpen={setIsOpen}>
           {selectedUid && (
