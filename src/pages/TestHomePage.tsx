@@ -2,71 +2,57 @@
 import { CustomTransition } from "@/components/customs/CustomTransition";
 import { CustomContainer } from "@/components/customs/CustomContainer";
 import { Text, Box, SimpleGrid, Image } from "@chakra-ui/react";
-import { db } from "@/firebase/firebase";
-import { collection, onSnapshot } from "firebase/firestore";
 import { useState, useEffect } from "react";
+import thumbnail_example from "/public/thumbnail_example.jpg";
 
-type Thumbnail = {
+type ThumbnailTest = {
   thumbnailUrl: string;
-  postedAt: Date;
 };
 
-export const HomePage = () => {
-  const [thumbnails, setThumbnails] = useState<Thumbnail[]>([]);
+export const TestHomePage = () => {
+  const [thumbnails] = useState<ThumbnailTest[]>(
+    new Array(500).fill({
+      thumbnailUrl: thumbnail_example,
+    })
+  );
+  const [length, setLength] = useState(0);
   const [gridColumns, setGridColumns] = useState(6);
   const [gridGap, setGridGap] = useState(0.5);
-  const [length, setLength] = useState(0);
 
   //* 投稿画像リアルタイム取得
   useEffect(() => {
-    const unsubscribe = onSnapshot(
-      collection(db, "thumbnails"),
-      async (snapshot) => {
-        const _thumbnails = snapshot.docs.map((doc) => doc.data());
-        // 数に応じてレイアウトを調整
-        const _length = _thumbnails.length;
-        setLength(_length);
-        if (_length <= 60) {
-          setGridColumns(6);
-          setGridGap(0.5);
-        } else if (_length <= 104) {
-          setGridColumns(8);
-          setGridGap(0.3);
-        } else if (_length <= 209) {
-          setGridColumns(8);
-          setGridGap(0.3);
-        } else if (_length <= 308) {
-          setGridColumns(14);
-          setGridGap(0.2);
-        } else if (_length <= 400) {
-          setGridColumns(16);
-          setGridGap(0.1);
-        } else {
-          setGridColumns(18);
-          setGridGap(0.1);
-        }
-        // date型に変換
-        _thumbnails.forEach((data) => (data.postedAt = data.postedAt.toDate()));
-        // 昇順に並び替え
-        _thumbnails.sort((a, b) => b.postedAt.getTime() - a.postedAt.getTime());
-        // ユーザー情報を登録
-        setThumbnails(_thumbnails as Thumbnail[]);
-      }
-    );
-
-    return () => {
-      unsubscribe();
-    };
-  }, []);
+    // 数に応じてレイアウトを調整
+    const _length = thumbnails.length;
+    setLength(_length);
+    if (_length <= 60) {
+      setGridColumns(6);
+      setGridGap(0.5);
+    } else if (_length <= 104) {
+      setGridColumns(8);
+      setGridGap(0.3);
+    } else if (_length <= 209) {
+      setGridColumns(8);
+      setGridGap(0.3);
+    } else if (_length <= 308) {
+      setGridColumns(14);
+      setGridGap(0.2);
+    } else if (_length <= 400) {
+      setGridColumns(16);
+      setGridGap(0.1);
+    } else {
+      setGridColumns(18);
+      setGridGap(0.1);
+    }
+  }, [thumbnails]);
 
   return (
     <CustomTransition>
       <CustomContainer type="main" justify={"start"}>
-        <Text fontSize={"3xl"} px={2}>
-          PSIギネスチャレンジ
+        <Text fontSize={"2xl"} px={2} color={"red.500"}>
+          ホームページ 表示テスト
         </Text>
 
-        <Box p={2}>
+        <Box px={1}>
           <SimpleGrid columns={gridColumns} gap={gridGap}>
             {thumbnails.map((photo, index) => (
               <Box

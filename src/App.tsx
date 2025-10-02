@@ -21,6 +21,7 @@ import { InformationPage } from "./pages/InformationPage";
 import { PostedPhotoList } from "./pages/PostedPhotoList";
 import { PhotoConfirmationPage } from "./pages/PhotoConfirmationPage";
 import { ChangeNicknamePage } from "./pages/ChangeNickname";
+import { TestHomePage } from "./pages/TestHomePage";
 
 function App() {
   return (
@@ -36,10 +37,10 @@ function App() {
           {/* <Box h={"10%"} w={"100%"} bg={"green.200"}>
             <Header />
           </Box> */}
-          <Box h={"95%"} w={"100%"} bg={"orange.200"}>
+          <Box h={"97%"} w={"100%"} bg={"orange.200"}>
             <Body />
           </Box>
-          <Box h={"5%"} w={"100%"} bg={"purple.200"}>
+          <Box h={"3%"} w={"100%"} bg={"gray.400"}>
             <Footer />
           </Box>
         </VStack>
@@ -78,6 +79,8 @@ const Body = () => {
               path={route.main.changeNickname}
               element={<ChangeNicknamePage />}
             />
+            //! for debug ホームページ表示テスト用
+            <Route path={"/main/home-test"} element={<TestHomePage />} />
           </Route>
           //* 認証
           <Route path={route.auth.root} element={<AuthLayout />}>
