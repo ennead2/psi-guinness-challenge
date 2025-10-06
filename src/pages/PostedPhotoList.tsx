@@ -1,6 +1,6 @@
 import { CustomTransition } from "@/components/customs/CustomTransition";
 import { CustomContainer } from "@/components/customs/CustomContainer";
-import { Stack, Text, Image, SimpleGrid } from "@chakra-ui/react";
+import { Stack, Text, Image, SimpleGrid, Box } from "@chakra-ui/react";
 import { CustomDialog } from "@/components/customs/CustomDialog";
 import { useState, useEffect } from "react";
 import { db } from "@/firebase/firebase";
@@ -13,12 +13,14 @@ type User = {
   thumbnailUrl: string;
   isNicknameSet: boolean;
   isPhotoSet: boolean;
+  rotation: number;
   postedAt: Date;
 };
 
 type SelectedPhoto = {
   nickname: string;
   photoUrl: string;
+  rotation: number;
   postedAt: Date;
 };
 
@@ -48,6 +50,11 @@ export const PostedPhotoList = () => {
         postedUsers.forEach((user) => (user.postedAt = user.postedAt.toDate()));
         // 昇順に並び替え
         postedUsers.sort((a, b) => b.postedAt.getTime() - a.postedAt.getTime());
+        // 回転情報を追加
+        postedUsers.forEach((data) => {
+          if ("rotation" in data) return;
+          data.rotation = 0;
+        });
         // ユーザー情報を登録
         setUsers(postedUsers as User[]);
       }
@@ -67,6 +74,7 @@ export const PostedPhotoList = () => {
     setSelectedPhoto({
       nickname: user.nickname,
       photoUrl: user.photoUrl,
+      rotation: user.rotation,
       postedAt: user.postedAt,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -104,12 +112,23 @@ export const PostedPhotoList = () => {
               _hover={{ shadow: "md", transform: "scale(1.02)" }}
               transition="all 0.2s"
             >
-              <Image
-                src={user.thumbnailUrl}
-                alt=""
-                minH={"100px"}
-                fit={"contain"}
-              />
+              <Box
+                w="100%"
+                h="120px" // 👈 好きな固定高さに調整
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+              >
+                <Image
+                  src={user.thumbnailUrl}
+                  alt=""
+                  objectFit="contain"
+                  maxW="100%"
+                  maxH="100%"
+                  transform={`rotate(${user.rotation}deg)`}
+                  transformOrigin="center center" // 👈 回転の基点を中央に
+                />
+              </Box>
               <Text>{user.nickname}</Text>
               <Text>
                 {user.postedAt
@@ -127,6 +146,7 @@ export const PostedPhotoList = () => {
                 src={selectedPhoto?.photoUrl}
                 h={"500px"}
                 fit={"contain"}
+                transform={`rotate(${selectedPhoto?.rotation}deg)`}
               />
               <Text>投稿ユーザー：{selectedPhoto?.nickname}</Text>
               <Text>投稿日時：{selectedPhoto?.postedAt.toLocaleString()}</Text>

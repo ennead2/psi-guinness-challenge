@@ -10,4 +10,13 @@ export default defineConfig({
   server: {
     host: true,
   },
+  // piexif-tsを明示的にバンドル対象に追加
+  optimizeDeps: {
+    include: ["piexif-ts"], // 明示的にバンドル対象に追加
+  },
+  resolve: {
+    alias: {
+      "piexif-ts": "piexif-ts/dist/piexif.js", // 実体のファイルを指定
+    },
+  },
 });

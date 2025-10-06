@@ -47,7 +47,8 @@ export const InputNicknamePage = () => {
   //* 入力内容取得
   const handleNicknameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setIsDuplicate(false);
-    setNickname(event.target.value);
+    const value = event.target.value.substring(0, 16);
+    setNickname(value);
   };
 
   //* エンターキーで送信

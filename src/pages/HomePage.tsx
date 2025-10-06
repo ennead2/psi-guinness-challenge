@@ -9,6 +9,7 @@ import { useState, useEffect } from "react";
 type Thumbnail = {
   thumbnailUrl: string;
   postedAt: Date;
+  rotation: number;
 };
 
 export const HomePage = () => {
@@ -49,6 +50,11 @@ export const HomePage = () => {
         _thumbnails.forEach((data) => (data.postedAt = data.postedAt.toDate()));
         // 昇順に並び替え
         _thumbnails.sort((a, b) => b.postedAt.getTime() - a.postedAt.getTime());
+        // 回転情報を追加
+        _thumbnails.forEach((data) => {
+          if ("rotation" in data) return;
+          data.rotation = 0;
+        });
         // ユーザー情報を登録
         setThumbnails(_thumbnails as Thumbnail[]);
       }
@@ -95,6 +101,7 @@ export const HomePage = () => {
                   // objectFit="cover"
                   w="100%"
                   aspectRatio={1 / 1}
+                  transform={`rotate(${photo.rotation}deg)`}
                 />
               </Box>
             ))}

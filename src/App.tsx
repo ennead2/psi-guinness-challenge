@@ -22,6 +22,7 @@ import { PostedPhotoList } from "./pages/PostedPhotoList";
 import { PhotoConfirmationPage } from "./pages/PhotoConfirmationPage";
 import { ChangeNicknamePage } from "./pages/ChangeNickname";
 import { TestHomePage } from "./pages/TestHomePage";
+import { PSILinkPage } from "./pages/PSILinkPage";
 
 function App() {
   return (
@@ -81,6 +82,8 @@ const Body = () => {
             />
             //! for debug ホームページ表示テスト用
             <Route path={"/main/home-test"} element={<TestHomePage />} />
+            //! for debug PSIリンクページ
+            <Route path={"/main/psi-link"} element={<PSILinkPage />} />
           </Route>
           //* 認証
           <Route path={route.auth.root} element={<AuthLayout />}>

@@ -44,14 +44,7 @@ export const MainLayout = () => {
   }, [uid]);
 
   return (
-    <Stack
-      w={"100%"}
-      h={"100%"}
-      bg={"gray.200"}
-      align={"start"}
-      justify={"start"}
-      gap={0}
-    >
+    <Stack w={"100%"} h={"100%"} gap={0} bg={"gray.200"}>
       <header
         style={{
           height: "6%",
@@ -65,6 +58,7 @@ export const MainLayout = () => {
         style={{
           height: "88%",
           width: "100%",
+          overflowY: "scroll",
         }}
       >
         <Outlet />

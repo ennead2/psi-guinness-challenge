@@ -19,7 +19,7 @@
 //    <Camera ref={cameraRef} />
 
 import { useEffect, useRef, forwardRef, useImperativeHandle } from "react";
-import { isMobile } from "react-device-detect";
+// import { isMobile } from "react-device-detect";
 
 export type CameraHandle = {
   takeScreenshot: () => string | null;
@@ -33,17 +33,14 @@ export const Camera = forwardRef<CameraHandle>((_, ref) => {
     const startCamera = async () => {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: isMobile
-            ? {
-                width: { ideal: 1080 },
-                height: { ideal: 1920 },
-                facingMode: "environment",
-              }
-            : {
-                width: { ideal: 1920 },
-                height: { ideal: 1080 },
-                facingMode: "environment",
-              },
+          video: {
+            facingMode: "environment",
+            // 解像度の目安
+            // width: { ideal: isMobile ? 1080 : 1920 },
+            // height: { ideal: isMobile ? 1920 : 1080 },
+            width: { ideal: 9999 },
+            height: { ideal: 9999 },
+          },
           audio: false,
         });
 
@@ -71,6 +68,7 @@ export const Camera = forwardRef<CameraHandle>((_, ref) => {
       if (!videoRef.current || !canvasRef.current) return null;
 
       const video = videoRef.current;
+
       const canvas = canvasRef.current;
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
@@ -89,8 +87,28 @@ export const Camera = forwardRef<CameraHandle>((_, ref) => {
   };
 
   return (
-    <div>
-      <video ref={videoRef} onLoadedData={handleLoadedData} playsInline muted />
+    <div
+    // style={{
+    //   width: "100%", // 横幅いっぱい
+    //   maxWidth: "480px", // スマホを意識して制限
+    //   // aspectRatio: isMobile ? "9 / 16" : "16 / 9", // 縦長の枠
+    //   aspectRatio: "9 / 16", // 縦長の枠
+    //   backgroundColor: "black", // 黒で覆うとカメラっぽい
+    //   position: "relative",
+    // }}
+    >
+      <video
+        ref={videoRef}
+        onLoadedData={handleLoadedData}
+        playsInline
+        muted
+        // style={{
+        //   width: "100%",
+        //   height: "100%",
+        //   objectFit: "cover", // 枠にフィット
+        //   // transform: "scaleX(-1)", // 必要なら自撮り用に左右反転
+        // }}
+      />
       <canvas ref={canvasRef} style={{ display: "none" }} />
     </div>
   );

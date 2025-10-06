@@ -6,9 +6,10 @@ import {
 } from "@chakra-ui/react";
 import { FaArrowLeft } from "react-icons/fa";
 import { FaCamera } from "react-icons/fa";
+import { FaRotate } from "react-icons/fa6";
 
 type CustomButtonProps = Omit<ButtonProps, "type"> & {
-  type?: "ok" | "cancel" | "back" | "photo" | "select";
+  type?: "ok" | "cancel" | "back" | "photo" | "select" | "rotate";
 };
 
 export const CustomButton = ({
@@ -78,6 +79,18 @@ export const CustomButton = ({
         >
           {children}
         </Button>
+      ) : type === "rotate" ? (
+        <Stack
+          bg={"gray.600"}
+          color={"white"}
+          p={2}
+          rounded={"full"}
+          cursor={"pointer"}
+          _hover={{ bg: "gray.500" }}
+          {...(props as StackProps)}
+        >
+          <FaRotate size={20} />
+        </Stack>
       ) : null}
     </>
   );

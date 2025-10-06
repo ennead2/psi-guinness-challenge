@@ -1,22 +1,39 @@
 import { CustomTransition } from "@/components/customs/CustomTransition";
 import { CustomContainer } from "@/components/customs/CustomContainer";
-import { Text, Image, Spacer } from "@chakra-ui/react";
+import { Text, Image, Spacer, Flex } from "@chakra-ui/react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { route } from "@/route/route";
 import { CustomButton } from "@/components/customs/CustomButton";
-import { db, storage } from "@/firebase/firebase";
+import { db, storage, functions } from "@/firebase/firebase";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
-import { ref, uploadBytes } from "firebase/storage";
+import { ref, uploadBytes, uploadString } from "firebase/storage";
 import { uidAtom } from "@/state/atom";
 import { useAtomValue } from "jotai/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import imageCompression from "browser-image-compression";
+import { type TakePhotoPageState } from "./TakePhotoPage";
+import { uploadBase64Image } from "@/components/shiinaFunctions/shiina_utility";
+import { httpsCallable } from "firebase/functions";
+import { rotateImage } from "@/components/lib/editImage";
+
+//! psiと連携するか切り替え
+const psiMode = false;
 
 export const PhotoConfirmationPage = () => {
-  const { state } = useLocation();
+  const state = useLocation().state as TakePhotoPageState;
   const navigate = useNavigate();
   const uid = useAtomValue(uidAtom);
   const [isSending, setIsSending] = useState(false);
+  const [rotation, setRotation] = useState(0);
+
+  //* 初回は撮影時の向きを反映
+  useEffect(() => {
+    if (state.orientation === "portrait-primary") setRotation(0);
+    else if (state.orientation === "portrait-secondary") setRotation(180);
+    else if (state.orientation === "landscape-primary") setRotation(-90);
+    else if (state.orientation === "landscape-secondary") setRotation(90);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   //* base64からFileオブジェクトに変換
   const base64ToFile = (
@@ -65,45 +82,74 @@ export const PhotoConfirmationPage = () => {
     setIsSending(true);
     try {
       if (!uid) return;
-      // base64からFileオブジェクトに変換
-      const imageFile = base64ToFile(state.image, "photo.jpg");
-      // 画像を圧縮
-      const compressedFilePhoto = await compressImage(imageFile, 1024);
-      const compressedFileThumbnail = await compressImage(imageFile, 200);
-      // Firebase Storageに保存するパスを指定
-      const imageRefPhoto = ref(storage, `users/${uid}/${uid}_photo.jpg`);
-      const imageRefThumbnail = ref(
-        storage,
-        `users/${uid}/${uid}_thumbnail.jpg`
-      );
-      const directUrlPhoto = `https://firebasestorage.googleapis.com/v0/b/${
-        import.meta.env.VITE_FIREBASE_STORAGE_BUCKET
-      }/o/users%2F${uid}%2F${uid}_photo.jpg?alt=media`;
-      const directUrlThumbnail = `https://firebasestorage.googleapis.com/v0/b/${
-        import.meta.env.VITE_FIREBASE_STORAGE_BUCKET
-      }/o/users%2F${uid}%2F${uid}_thumbnail.jpg?alt=media`;
-      // Firebase Storageに画像をアップロード
-      await uploadBytes(imageRefPhoto, compressedFilePhoto);
-      await uploadBytes(imageRefThumbnail, compressedFileThumbnail);
-      // Firestoreに画像のURLを保存
-      await setDoc(
-        doc(db, "users", uid),
-        {
-          photoUrl: directUrlPhoto,
-          thumbnailUrl: directUrlThumbnail,
-          postedAt: serverTimestamp(),
-        },
-        { merge: true }
-      );
-      // サムネイルコレクションにも保存
-      await setDoc(
-        doc(db, "thumbnails", uid),
-        {
-          thumbnailUrl: directUrlThumbnail,
-          postedAt: serverTimestamp(),
-        },
-        { merge: true }
-      );
+      if (psiMode) {
+        //* psiに画像を送信
+        // firebaseのhttpsCallableを呼び出す
+        const uploadImage = httpsCallable(functions, "relayUpload");
+        // psiに画像を送信
+        const data = await uploadBase64Image(state.image, uploadImage);
+        // サムネイル画像をfirestoreに保存
+        const imageRefThumbnail = ref(
+          storage,
+          `users/${uid}/${uid}_thumbnail.jpg`
+        );
+        const directUrlThumbnail = `https://firebasestorage.googleapis.com/v0/b/${
+          import.meta.env.VITE_FIREBASE_STORAGE_BUCKET
+        }/o/users%2F${uid}%2F${uid}_thumbnail.jpg?alt=media`;
+        await uploadString(imageRefThumbnail, data.base64data, "data_url");
+        // firestoreに保存
+        await setDoc(
+          doc(db, "psi-users", uid),
+          {
+            thumbnailUrl: directUrlThumbnail,
+            postedAt: serverTimestamp(),
+          },
+          { merge: true }
+        );
+      } else {
+        //* firebaseに画像を送信
+        // base64からFileオブジェクトに変換
+        const imageFile = base64ToFile(state.image, "photo.jpg");
+        // 画像を回転
+        const rotatedFile = await rotateImage(imageFile, rotation);
+        // 画像を圧縮
+        const compressedFilePhoto = await compressImage(rotatedFile, 1024);
+        const compressedFileThumbnail = await compressImage(rotatedFile, 200);
+        // Firebase Storageに保存するパスを指定
+        const imageRefPhoto = ref(storage, `users/${uid}/${uid}_photo.jpg`);
+        const imageRefThumbnail = ref(
+          storage,
+          `users/${uid}/${uid}_thumbnail.jpg`
+        );
+        const directUrlPhoto = `https://firebasestorage.googleapis.com/v0/b/${
+          import.meta.env.VITE_FIREBASE_STORAGE_BUCKET
+        }/o/users%2F${uid}%2F${uid}_photo.jpg?alt=media`;
+        const directUrlThumbnail = `https://firebasestorage.googleapis.com/v0/b/${
+          import.meta.env.VITE_FIREBASE_STORAGE_BUCKET
+        }/o/users%2F${uid}%2F${uid}_thumbnail.jpg?alt=media`;
+        // Firebase Storageに画像をアップロード
+        await uploadBytes(imageRefPhoto, compressedFilePhoto);
+        await uploadBytes(imageRefThumbnail, compressedFileThumbnail);
+        // Firestoreに画像のURLを保存
+        await setDoc(
+          doc(db, "users", uid),
+          {
+            photoUrl: directUrlPhoto,
+            thumbnailUrl: directUrlThumbnail,
+            postedAt: serverTimestamp(),
+          },
+          { merge: true }
+        );
+        // サムネイルコレクションにも保存
+        await setDoc(
+          doc(db, "thumbnails", uid),
+          {
+            thumbnailUrl: directUrlThumbnail,
+            postedAt: serverTimestamp(),
+          },
+          { merge: true }
+        );
+      }
       // 投稿写真一覧ページに遷移
       navigate(route.main.postedPhotoList);
     } catch (error) {
@@ -129,15 +175,28 @@ export const PhotoConfirmationPage = () => {
 
         <Spacer />
 
-        <Image src={state.image} />
+        <Image src={state.image} transform={`rotate(${rotation}deg)`} />
 
-        <Spacer />
+        <Flex w={"100%"} justify={"end"} px={2} py={1}>
+          <CustomButton
+            type="rotate"
+            disabled={true}
+            onClick={async () => {
+              const rot = rotation === 270 ? 0 : rotation + 90;
+              setRotation(rot);
+            }}
+          >
+            画像回転ボタン
+          </CustomButton>
+        </Flex>
+
+        {/* <Spacer />
 
         <Text fontSize={"md"} p={4}>
           写真は一度しか投稿できません。
           <br />
           また、投稿後の変更はできません。
-        </Text>
+        </Text> */}
 
         <Spacer />
 

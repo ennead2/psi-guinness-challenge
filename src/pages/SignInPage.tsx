@@ -25,7 +25,8 @@ export const SignInPage = () => {
   const lineLoginUrl =
     `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=${LINE_CLIENT_ID}` +
     `&redirect_uri=${encodeURIComponent(redirect_uri)}` +
-    `&state=random_state&scope=openid%20profile%20email`;
+    `&state=${ulid()}` +
+    `&scope=openid%20profile%20email`;
 
   //* カスタムログイン
   const customLoginUrl = `https://asia-northeast1-psiguinnesschallenge.cloudfunctions.net/customAuthApi/customToken?uid=random:`;
